@@ -141,7 +141,7 @@ IAM 정책 예시:
 
 1. "Create New Command" 클릭
 2. Command: `/문자발송`
-3. Request URL: Lambda 함수의 API Gateway URL
+3. Request URL: Lambda Function URL
 4. Short Description: "문자 발송 모달을 실행합니다"
 5. "Save" 클릭
 
@@ -150,7 +150,7 @@ IAM 정책 예시:
 "Interactivity & Shortcuts" 섹션에서:
 
 1. "Interactivity" 활성화
-2. Request URL: Lambda 함수의 API Gateway URL
+2. Request URL: Lambda Function URL
 3. "Save Changes" 클릭
 
 이 봇은 Slack 모달의 `view_submission` 이벤트를 사용하므로 Interactivity Request URL 설정이 필요합니다.
@@ -172,17 +172,18 @@ IAM 정책 예시:
 
 현재 코드의 발신번호 목록은 `config.py`의 `SENDER_NUMBERS` 상수에서 관리합니다.
 
-### 4. API Gateway 설정
+### 4. Lambda Function URL 설정
 
-Lambda 함수에 대한 API Gateway 엔드포인트 생성:
+Slack에서 Lambda 함수를 직접 호출할 수 있도록 Function URL을 생성합니다:
 
-1. AWS 콘솔에서 API Gateway 서비스로 이동
-2. "API 생성" 클릭
-3. "HTTP API" 선택
-4. 통합 대상으로 `slack_message` Lambda 함수 선택
-5. 메서드: POST
-6. 리소스 경로: `/slack-message`
-7. API 생성 후 Invoke URL을 Slack 앱의 Slash Command 및 Interactivity Request URL에 사용
+1. AWS 콘솔에서 Lambda 서비스로 이동
+2. `slack_message` 함수 선택
+3. "구성" 탭에서 "함수 URL" 선택
+4. "함수 URL 생성" 클릭
+5. Auth type은 `NONE`으로 설정
+6. 생성된 Function URL을 Slack 앱의 Slash Command 및 Interactivity Request URL에 사용
+
+Slack 요청 검증은 `SLACK_SIGNING_SECRET`을 사용하는 Slack Bolt에서 처리합니다.
 
 ## 사용 방법
 
@@ -273,11 +274,11 @@ Solapi SMS 발송, DynamoDB 발송 이력 저장, 메시지 제목 추출을 담
 1. **Slack 모달이 열리지 않음**
    - `BOT_TOKEN`과 `SLACK_SIGNING_SECRET` 환경 변수가 올바른지 확인
    - Slack 앱에 `commands`, `chat:write` 권한이 있는지 확인
-   - Slash Command Request URL이 API Gateway URL과 일치하는지 확인
+   - Slash Command Request URL이 Lambda Function URL과 일치하는지 확인
 
 2. **모달 제출 후 응답이 없음**
    - Slack 앱의 Interactivity가 활성화되어 있는지 확인
-   - Interactivity Request URL이 API Gateway URL과 일치하는지 확인
+   - Interactivity Request URL이 Lambda Function URL과 일치하는지 확인
    - Lambda CloudWatch Logs에서 Slack Bolt 오류 확인
 
 3. **권한 없음 메시지가 표시됨**
